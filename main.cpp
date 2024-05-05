@@ -7,7 +7,8 @@
 #include<thread>
 #include<string.h>
 #include<vector>
-
+//æ­¤æ®µæ–‡ä»¶ä¸»è¦æ¥æºäºcsdnä¸­Cche1çš„å¼€æºä»£ç ï¼Œåœ¨æ­¤åŸºç¡€ä¸Šæ·»åŠ äº†å¤šçº¿ç¨‹è¿æ¥å¤šä¸ªå®¢æˆ·ç«¯çš„åŠŸèƒ½
+//åŸä»£ç ç½‘å€:https://blog.csdn.net/qq_27923041/article/details/83857964
 #pragma warning(disable:4996)
 using namespace std;
 
@@ -19,97 +20,97 @@ int arrptr = 0;
 void initialization();
 void clientrecv(int recv_len, SOCKET s_accept, char* recv_buf,HWND handle);
 int serverinital(HWND handle) {
-	//¶¨Òå³¤¶È±äÁ¿
+	//å®šä¹‰é•¿åº¦å˜é‡
 	int send_len = 0;
 	int recv_len = 0;
 	int len = 0;
-	//¶¨Òå·¢ËÍ»º³åÇøºÍ½ÓÊÜ»º³åÇø
+	//å®šä¹‰å‘é€ç¼“å†²åŒºå’Œæ¥å—ç¼“å†²åŒº
 	char recv_buf[1024];
-	//¶¨Òå·şÎñ¶ËÌ×½Ó×Ö£¬½ÓÊÜÇëÇóÌ×½Ó×Ö
+	//å®šä¹‰æœåŠ¡ç«¯å¥—æ¥å­—ï¼Œæ¥å—è¯·æ±‚å¥—æ¥å­—
 	SOCKET s_server;
 
-	//·şÎñ¶ËµØÖ·¿Í»§¶ËµØÖ·
+	//æœåŠ¡ç«¯åœ°å€å®¢æˆ·ç«¯åœ°å€
 	SOCKADDR_IN server_addr;
 	SOCKADDR_IN accept_addr;
 	initialization();
-	//Ìî³ä·şÎñ¶ËĞÅÏ¢
+	//å¡«å……æœåŠ¡ç«¯ä¿¡æ¯
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 	server_addr.sin_port = htons(5010);
-	//´´½¨Ì×½Ó×Ö
+	//åˆ›å»ºå¥—æ¥å­—
 	s_server = socket(AF_INET, SOCK_STREAM, 0);
 	if (bind(s_server, (SOCKADDR*)&server_addr, sizeof(SOCKADDR)) == SOCKET_ERROR) {
-		printf("Ì×½Ó×Ö°ó¶¨Ê§°Ü£¡\n");
+		printf("å¥—æ¥å­—ç»‘å®šå¤±è´¥ï¼\n");
 		WSACleanup();
 	}
 	else {
-		printf("Ì×½Ó×Ö°ó¶¨³É¹¦£¡\n");
+		printf("å¥—æ¥å­—ç»‘å®šæˆåŠŸï¼\n");
 	}
-	//ÉèÖÃÌ×½Ó×ÖÎª¼àÌı×´Ì¬
+	//è®¾ç½®å¥—æ¥å­—ä¸ºç›‘å¬çŠ¶æ€
 	if (listen(s_server, SOMAXCONN) < 0) {
-		printf("ÉèÖÃ¼àÌı×´Ì¬Ê§°Ü£¡\n");
+		printf("è®¾ç½®ç›‘å¬çŠ¶æ€å¤±è´¥ï¼\n");
 		WSACleanup();
 	}
 	else {
-		printf("ÉèÖÃ¼àÌı×´Ì¬³É¹¦£¡\n");
+		printf("è®¾ç½®ç›‘å¬çŠ¶æ€æˆåŠŸï¼\n");
 	}
-	printf("·şÎñ¶ËÕıÔÚ¼àÌıÁ¬½Ó£¬ÇëÉÔºò....\n");
+	printf("æœåŠ¡ç«¯æ­£åœ¨ç›‘å¬è¿æ¥ï¼Œè¯·ç¨å€™....\n");
 	std::thread Cthread[256];
 	int ptr = 0;
 	while (true)
 	{
-		//½ÓÊÜÁ¬½ÓÇëÇó
+		//æ¥å—è¿æ¥è¯·æ±‚
 		SOCKET s_accept;
 		len = sizeof(SOCKADDR);
 		s_accept = accept(s_server, (SOCKADDR*)&accept_addr, &len);
 		if (s_accept == SOCKET_ERROR) {
-			printf("Á¬½ÓÊ§°Ü£¡\n");
+			printf("è¿æ¥å¤±è´¥ï¼\n");
 			WSACleanup();
 			return 0;
 		}
-		printf("%dºÅÁ¬½Ó½¨Á¢£¬×¼±¸½ÓÊÜÊı¾İ\n", ptr);
+		printf("%då·è¿æ¥å»ºç«‹ï¼Œå‡†å¤‡æ¥å—æ•°æ®\n", ptr);
 		Cthread[ptr] = std::thread(clientrecv, recv_len, s_accept, recv_buf,handle);
 		Cthread[ptr].detach();
 		ptr++;
 
 	}
 
-	//¹Ø±ÕÌ×½Ó×Ö
+	//å…³é—­å¥—æ¥å­—
 	closesocket(s_server);
 
-	//ÊÍ·ÅDLL×ÊÔ´
+	//é‡Šæ”¾DLLèµ„æº
 	WSACleanup();
 	return 0;
 }
 void initialization() {
-	//³õÊ¼»¯Ì×½Ó×Ö¿â
-	WORD w_req = MAKEWORD(2, 2);//°æ±¾ºÅ
+	//åˆå§‹åŒ–å¥—æ¥å­—åº“
+	WORD w_req = MAKEWORD(2, 2);//ç‰ˆæœ¬å·
 	WSADATA wsadata;
 	int err;
 	err = WSAStartup(w_req, &wsadata);
 	if (err != 0) {
-		printf("³õÊ¼»¯Ì×½Ó×Ö¿âÊ§°Ü£¡\n");
+		printf("åˆå§‹åŒ–å¥—æ¥å­—åº“å¤±è´¥ï¼\n");
 	}
 	else {
-		printf("³õÊ¼»¯Ì×½Ó×Ö¿â³É¹¦£¡\n");
+		printf("åˆå§‹åŒ–å¥—æ¥å­—åº“æˆåŠŸï¼\n");
 	}
-	//¼ì²â°æ±¾ºÅ
+	//æ£€æµ‹ç‰ˆæœ¬å·
 	if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2) {
-		printf("Ì×½Ó×Ö¿â°æ±¾ºÅ²»·û£¡\n");
+		printf("å¥—æ¥å­—åº“ç‰ˆæœ¬å·ä¸ç¬¦ï¼\n");
 		WSACleanup();
 	}
 	else {
-		printf("Ì×½Ó×Ö¿â°æ±¾ÕıÈ·£¡\n");
+		printf("å¥—æ¥å­—åº“ç‰ˆæœ¬æ­£ç¡®ï¼\n");
 	}
-	//Ìî³ä·şÎñ¶ËµØÖ·ĞÅÏ¢
+	//å¡«å……æœåŠ¡ç«¯åœ°å€ä¿¡æ¯
 
 }
 void clientrecv(int recv_len, SOCKET s_accept, char* recv_buf,HWND handle)
 {
-	//½ÓÊÕÊı¾İ
-	//¶¨ÒåÏûÏ¢ÄÚÈİ
-	//ddd               ,ccc     ,dddd     ,xx      ,xxxx(Ò»°ã²»ĞèÒª)
-	//(int)×ÔÉíÉè±¸±àºÅ,Éè±¸ÃèÊö  Éè¶¨Ê±¼ä  Éè±¸×´Ì¬ Ê£ÓàÊ±¼ä
+	//æ¥æ”¶æ•°æ®
+	//å®šä¹‰æ¶ˆæ¯å†…å®¹
+	//ddd               ,ccc     ,dddd     ,xx      ,xxxx(ä¸€èˆ¬ä¸éœ€è¦)
+	//(int)è‡ªèº«è®¾å¤‡ç¼–å·,è®¾å¤‡æè¿°  è®¾å®šæ—¶é—´  è®¾å¤‡çŠ¶æ€ å‰©ä½™æ—¶é—´
 	
 	std::vector<string>infos;
 	int ptr = 0;
@@ -117,7 +118,7 @@ void clientrecv(int recv_len, SOCKET s_accept, char* recv_buf,HWND handle)
 	recv_len = recv(s_accept, recv_buf, 100, 0);
 
 	if (recv_len < 0) {
-		printf("½ÓÊÜÊ§°Ü£¡");
+		printf("æ¥å—å¤±è´¥ï¼");
 	}
 	else {
 		
